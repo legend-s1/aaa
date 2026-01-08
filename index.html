@@ -1,0 +1,27 @@
+<style>
+  .kick-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* نسبة 16:9 */
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    background: #000;
+  }
+  .kick-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+
+<div class="kick-wrapper">
+  <iframe 
+    src="https://player.kick.com/sxb" 
+    allowfullscreen="true" 
+    scrolling="no"
+    importance="high">
+  </iframe>
+</div>
