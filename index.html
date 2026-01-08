@@ -1,55 +1,40 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <style>
-        body { margin: 0; background-color: #000; }
-        .container { width: 100%; max-width: 960px; margin: 20px auto; }
-        #kick-player { width: 100%; height: auto; aspect-ratio: 16/9; }
+        .video-box { width: 100%; max-width: 800px; margin: auto; background: #000; }
+        #my-player { width: 100%; height: auto; aspect-ratio: 16/9; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <video id="kick-player" class="video-js vjs-big-play-centered" controls preload="auto">
-        <p class="vjs-no-js">يرجى تفعيل الجافا سكربت لمشاهدة البث.</p>
-    </video>
+<div class="video-box">
+    <video id="my-player" class="video-js vjs-default-skin" controls preload="auto"></video>
 </div>
 
 <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
 <script>
-    async function startStream(channelUser) {
-        // نستخدم وسيطاً (Proxy) لتجاوز حماية المتصفح (CORS)
-        const proxyUrl = "https://cors-anywhere.herokuapp.com/"; 
-        const kickApi = `https://kick.com/api/v1/channels/${channelUser}`;
-
+    async function loadKickStream(channelName) {
         try {
-            // جلب بيانات القناة
-            const response = await fetch(proxyUrl + kickApi);
+            // نطلب الرابط من "وظيفتك" على Vercel وليس من Kick مباشرة
+            const response = await fetch(`/api/getStream?channel=${channelName}`);
             const data = await response.json();
-            
-            // استخراج رابط البث الفعلي .m3u8
-            const streamUrl = data.playback_url;
 
-            if (streamUrl) {
-                const player = videojs('kick-player');
-                player.src({
-                    src: streamUrl,
-                    type: 'application/x-mpegURL' // التنسيق المطلوب للبث المباشر
-                });
+            if (data.url) {
+                const player = videojs('my-player');
+                player.src({ src: data.url, type: 'application/x-mpegURL' });
                 player.play();
             } else {
-                alert("البث غير متاح حالياً لهذه القناة.");
+                console.error("البث غير متوفر");
             }
-        } catch (error) {
-            console.error("حدث خطأ أثناء جلب البث:", error);
-            alert("فشل تحميل البث. تأكد من اسم القناة أو جرب لاحقاً.");
+        } catch (e) {
+            console.error("خطأ في الاتصال بالخادم");
         }
     }
 
-    // ضع اسم القناة هنا بدلاً من 'اسم_القناة'
-    startStream('sxb');
+    // استبدل 'اسم_القناة' باسم قناتك الفعلي
+    loadKickStream('sxb');
 </script>
 </body>
 </html>
